@@ -1,7 +1,7 @@
 # txzboot
 tar.xz to uki/efi converter for linux.
 
-only slightly works
+Instead of taking long build times it takes long usage times!
 
 ## requirements (only needed on builder)
 - systemd-ukify
