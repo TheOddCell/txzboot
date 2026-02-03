@@ -36,35 +36,52 @@ if ! [ -f /boot.txz ]; then
   echo "<0>txzboot.loader: no boot.txz found, dropping to shell">&5
   exec sh
 fi
-echo "Press any key within 5 seconds to configure"
+printf "Press c within 5 seconds to configure, or press any other key to skip\r"
 CONFIG1SHELL="false"
 CONFIGSHELL="false"
 CONFIGPATH=""
 CONFIGPATHSET="false"
 CONFIGTARPROGRESS="false"
-if read -t 5 -n 1 key 2>/dev/null; then
-  echo "CONFIG: debug: exec [pid 1] shell now (press any key within 5 seconds to set)"
-  if read -t 5 -n 1 key 2>/dev/null; then
+read -t 5 -n 1 key 2>/dev/null
+if [ "$key" = "c" ]; then
+  unset key
+  printf "\r                                                                          "
+  printf "\rCONFIG: debug: exec [pid 1] shell now (y/n): "
+  read -n 1 key 2>/dev/null
+  if [ "$key" = "y" ]; then
     exec sh
   fi
-  echo "CONFIG: debug: exec [pid 1] shell after tar (press any key within 5 seconds to set)"
-  if read -t 5 -n 1 key 2>/dev/null; then
+  unset key
+  printf "\rCONFIG: debug: exec [pid 1] shell after tar (y/n): "
+  read -n 1 key 2>/dev/null
+  if [ "$key" = "y" ]; then
     CONFIG1SHELL="true"
+  else
+    unset key
+    printf "\rCONFIG: debug: run regular shell after tar (not pid 1) (y/n): "
+    read -n 1 key 2>/dev/null
+    if [ "$key" = "y" ]; then
+      CONFIGSHELL="true"
+    fi
+    unset key
+    printf "\r                                                                "
+    printf "\rCONFIG: init: add extra init path (y/n): "
+    read -n 1 key 2>/dev/null
+    if [ "$key" = "y" ]; then
+      printf "init path: "
+      read CONFIGPATH
+      CONFIGPATHSET="true"
+    fi
   fi
-  echo "CONFIG: debug: run regular shell after tar (not pid 1) (press any key within 5 seconds to set)"
-  if read -t 5 -n 1 key 2>/dev/null; then
-    CONFIGSHELL="true"
-  fi
-  echo "CONFIG: init: init path (press any key within 5 seconds to set)"
-  if read -t 5 -n 1 key 2>/dev/null; then
-    printf "init path: "
-    read CONFIGPATH
-    CONFIGPATHSET="true"
-  fi
-  echo "CONFIG: tar: show untar progress (press any key within 5 seconds to set)"
-  if read -t 5 -n 1 key 2>/dev/null; then
+  unset key
+  printf "\rCONFIG: tar: show untar progress (y/n): "
+  read -n 1 key 2>/dev/null
+  if [ "$key" = "y" ]; then
     CONFIGTARPROGRESS="true"
   fi
+  printf "\r                                         \r"
+else
+  printf "\r                                                                            \r"
 fi
 echo "<0>txzboot.loader: starting untar">&5
 if $CONFIGTARPROGRESS; then
@@ -84,7 +101,7 @@ mount -t sysfs sys /mnt/sys
 mount -t devtmpfs dev /mnt/dev
 echo "<0>txzboot.loader: core filesystems mounted at target">&5
 
-echo "txzboot.loader ready"
+echo "<0>txzboot.loader: ready">&5
 
 if $CONFIGPATHSET; then
   echo "<0>txzboot.loader: searching for init $CONFIGPATH">&5
