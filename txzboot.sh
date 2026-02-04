@@ -21,7 +21,7 @@ cat > rootfs/init << 'EOF'
 export PATH="/bin"
 exec </dev/console >/dev/console 2>&1
 
-mkdir -p /proc /sys /dev /mnt /mnt/proc /mnt/sys /mnt/dev
+mkdir -p /proc /sys /dev /mnt
 
 mount -t proc proc /proc
 mount -t sysfs sys /sys
@@ -42,6 +42,8 @@ CONFIGSHELL="false"
 CONFIGPATH=""
 CONFIGPATHSET="false"
 CONFIGTARPROGRESS="false"
+CONFIGNORAMFS="false"
+CONFIGDELROOTPASSWD="false"
 read -t 5 -n 1 key 2>/dev/null
 if [ "$key" = "c" ]; then
   unset key
@@ -58,20 +60,27 @@ if [ "$key" = "c" ]; then
     CONFIG1SHELL="true"
   else
     unset key
-  printf "\rCONFIG: debug: run regular shell after tar (not pid 1) (y/n): "
+    printf "\rCONFIG: debug: run regular shell after tar (not pid 1) (y/n): "
     read -n 1 key 2>/dev/null
     if [ "$key" = "y" ]; then
       CONFIGSHELL="true"
     fi
     unset key
-  printf "\r                                                                 "
-  printf "\rCONFIG: init: add extra init path (y/n): "
+    printf "\r                                                                 "
+    printf "\rCONFIG: init: add extra init path (y/n): "
     read -n 1 key 2>/dev/null
     if [ "$key" = "y" ]; then
       printf "init path: "
       read CONFIGPATH
       CONFIGPATHSET="true"
     fi
+    unset key
+    printf "\rCONFIG: user: delete root password (y/n): "
+    read -n 1 key 2>/dev/null
+    if [ "$key" = "y" ]; then
+      CONFIGDELROOTPASSWD="true"
+    fi
+    printf "\r                                            \r"
   fi
   unset key
   printf "\rCONFIG: tar: show untar progress (y/n): "
@@ -80,10 +89,15 @@ if [ "$key" = "c" ]; then
     CONFIGTARPROGRESS="true"
   fi
   printf "\r                                         \r"
+  printf "\rCONFIG: fs: don't use ramfs (y/n): "
+  read -n 1 key 2>/dev/null
+  if [ "$key" = "y" ]; then
+    CONFIGNORAMFS="true"
+  fi
+  printf "\r                                         \r"
 else
   printf "\r                                                                            \r"
 fi
-echo "<0>txzboot.loader: starting untar">&5
 TAREXT="tar"
 if [ -f "/boot.txz" ]; then
   TARFLAG="J"
@@ -92,6 +106,15 @@ elif [ -f "/boot.tgz" ]; then
   TARFLAG="z"
   TAREXT="tgz"
 fi
+if ! $CONFIGNORAMFS; then
+  mount -t ramfs ramfs /mnt
+fi
+mkdir /mnt/proc /mnt/sys /mnt/dev
+mount -t proc proc /mnt/proc
+mount -t sysfs sys /mnt/sys
+mount -t devtmpfs dev /mnt/dev
+echo "<0>txzboot.loader: core filesystems mounted at target">&5
+echo "<0>txzboot.loader: starting untar">&5
 if $CONFIGTARPROGRESS; then
   tar "-vx${TARFLAG}f" "/boot.${TAREXT}" -C /mnt
 else
@@ -104,10 +127,10 @@ elif $CONFIGSHELL; then
   sh
 fi
 
-mount -t proc proc /mnt/proc
-mount -t sysfs sys /mnt/sys
-mount -t devtmpfs dev /mnt/dev
-echo "<0>txzboot.loader: core filesystems mounted at target">&5
+if $CONFIGDELROOTPASSWD; then
+  echo "<0>txzboot.loader: deleted root password">&5
+  chroot /mnt passwd -d root
+fi
 
 echo "<0>txzboot.loader: ready">&5
 
