@@ -32,8 +32,8 @@ echo "txzboot">/proc/sys/kernel/hostname
 echo "<0>txzboot.loader: set hostname to 'txzboot'">&5
 echo "<0>txzboot.loader: core filesystems mounted">&5
 
-if ! [ -f /boot.txz ]; then
-  echo "<0>txzboot.loader: no boot.txz found, dropping to shell">&5
+if ! [ -f /boot.txz ] && ! [ -f /boot.tgz ] && ! [ -f /boot.tar ]; then
+  echo "<0>txzboot.loader: no boot.txz/tgz/tar found, dropping to shell">&5
   exec sh
 fi
 printf "Press c within 5 seconds to configure, or press any other key to skip\r"
@@ -58,14 +58,14 @@ if [ "$key" = "c" ]; then
     CONFIG1SHELL="true"
   else
     unset key
-    printf "\rCONFIG: debug: run regular shell after tar (not pid 1) (y/n): "
+  printf "\rCONFIG: debug: run regular shell after tar (not pid 1) (y/n): "
     read -n 1 key 2>/dev/null
     if [ "$key" = "y" ]; then
       CONFIGSHELL="true"
     fi
     unset key
-    printf "\r                                                                "
-    printf "\rCONFIG: init: add extra init path (y/n): "
+  printf "\r                                                                 "
+  printf "\rCONFIG: init: add extra init path (y/n): "
     read -n 1 key 2>/dev/null
     if [ "$key" = "y" ]; then
       printf "init path: "
@@ -84,10 +84,18 @@ else
   printf "\r                                                                            \r"
 fi
 echo "<0>txzboot.loader: starting untar">&5
+TAREXT="tar"
+if [ -f "/boot.txz" ]; then
+  TARFLAG="J"
+  TAREXT="txz"
+elif [ -f "/boot.tgz" ]; then
+  TARFLAG="z"
+  TAREXT="tgz"
+fi
 if $CONFIGTARPROGRESS; then
-  tar -vxJf /boot.txz -C /mnt
+  tar "-vx${TARFLAG}f" "/boot.${TAREXT}" -C /mnt
 else
-  tar -xJf /boot.txz -C /mnt
+  tar "-x${TARFLAG}f" "/boot.${TAREXT}" -C /mnt
 fi
 echo "<0>txzboot.loader: done untar">&5
 if $CONFIG1SHELL; then
@@ -130,8 +138,16 @@ EOF
 chmod a+x rootfs/init
 echo "txzboot.loader installed"
 if [ "$1" != '--shellonly' ]; then
-  cp "$1" rootfs/boot.txz
-  echo "boot.txz added"
+  if [ "${1##*.}" = "xz" ]; then
+    cp "$1" rootfs/boot.txz
+    echo "boot.txz added"
+  elif [ "${1##*.}" = "gz" ]; then
+    cp "$1" rootfs/boot.tgz
+    echo "boot.tgz added"
+  else
+    cp "$1" rootfs/boot.tar
+    echo "boot.tar added"
+  fi
 fi
 cd rootfs
 find . -print0 \
