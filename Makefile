@@ -17,7 +17,7 @@ txzboot: busybox.b64 txzboot.loader.b64
 	chmod +x txzboot; \
 
 clean:
-	rm -f txzboot busybox.b64 txzboot.loader.b64 txzboot.uki.efi
+	rm -rf txzboot busybox.b64 txzboot.loader.b64 txzboot.uki.efi rootfs initramfs-full.cpio.zst
 
 busybox.b64:
 	curl -fsSL '$(BUSYBOX_URL)' | base64 -w0 > busybox.b64;
