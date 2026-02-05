@@ -17,7 +17,7 @@ cd rootfs/bin
 cd ../..
 echo "<[txzboot.loader]>"    | base64 -d > rootfs/bin/txzboot.loader
 ln rootfs/bin/txzboot.loader rootfs/init
-chmod a+x rootfs/init rootfs/bin/txzboot.emergency
+chmod a+x rootfs/init
 echo "txzboot.loader installed"
 if [ "$1" != '--shellonly' ]; then
   if [ "${1##*.}" = "xz" ]; then
