@@ -5,3 +5,6 @@
 *.tar
 *.tar.xz
 txzboot
+*.b64
+*.cpio.zst
+rootfs
