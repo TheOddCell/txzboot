@@ -25,10 +25,4 @@ busybox.b64:
 txzboot.loader.b64:
 	base64 -w0 ./txzboot.loader.sh > txzboot.loader.b64;
 
-.PHONY: all clean shellonly
-
-shellonly: txzboot
-	./txzboot --shellonly
-
-%: txzboot
-	./txzboot "$@"
+.PHONY: all clean
