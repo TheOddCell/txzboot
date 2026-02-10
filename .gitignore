@@ -10,3 +10,4 @@ txzboot
 rootfs
 vmlinuz
 linux
+.vmlinuz
