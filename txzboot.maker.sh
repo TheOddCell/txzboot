@@ -41,7 +41,10 @@ find . -print0 \
  | cpio --null -o --format=newc \
  | zstd -19 -T0 > ../initramfs-full.cpio.zst
 cd ..
-ukify build --linux /boot/vmlinuz-linux --initrd initramfs-full.cpio.zst --cmdline "rw" --output "txzboot.uki.efi"
+ukify build \
+  --linux vmlinuz \
+  --initrd initramfs-full.cpio.zst \
+  --cmdline "rw" --output "txzboot.uki.efi"
 echo "txzboot.loader created"
 echo "Cleaning up..."
 rm -rf rootfs initramfs-full.cpio.zst

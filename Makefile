@@ -17,7 +17,7 @@ txzboot: busybox.b64 txzboot.loader.b64
 	chmod +x txzboot; \
 
 clean:
-	rm -rf txzboot busybox.b64 txzboot.loader.b64 txzboot.uki.efi rootfs initramfs-full.cpio.zst
+	rm -rf txzboot busybox.b64 txzboot.loader.b64 txzboot.uki.efi rootfs initramfs-full.cpio.zst vmlinuz
 	cd linux; \
 	make clean
 
