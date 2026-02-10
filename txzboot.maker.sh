@@ -38,7 +38,7 @@ find . -print0 \
 cd ..
 echo "<[vmlinuz]>" | base64 -d > vmlinuz.tmp
 ukify build \
-  --linux - \
+  --linux vmlinuz.tmp \
   --initrd initramfs-full.cpio.zst \
   --cmdline "rw" --output "txzboot.uki.efi"
 echo "txzboot.loader created"
