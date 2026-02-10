@@ -31,7 +31,7 @@ txzboot.loader.b64:
 .PHONY: all clean nokernclean
 
 vmlinuz:
-	git submodule init linux
+	git submodule update --init
 	cd linux && \
 	git checkout v6.19 && \
 	make defconfig && \
