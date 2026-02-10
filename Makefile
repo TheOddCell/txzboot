@@ -19,6 +19,7 @@ txzboot: busybox.b64 txzboot.loader.b64
 clean: nokernclean
 	cd linux; \
 	make clean
+
 nokernclean:
 	rm -rf txzboot busybox.b64 txzboot.loader.b64 txzboot.uki.efi rootfs initramfs-full.cpio.zst vmlinuz
 
@@ -26,14 +27,12 @@ busybox.b64:
 	curl -fsSL "$(BUSYBOX_URL)" | base64 -w0 > busybox.b64
 
 txzboot.loader.b64:
-	base64 -w0 ./txzboot.loader.sh > txzboot.loader.b64;
+	base64 -w0 ./txzboot.loader.sh > txzboot.loader.b64
 
 .PHONY: all clean nokernclean
 
-vmlinuz:
-	git submodule update --init
+vmlinuz: linux
 	cd linux && \
-	git checkout v6.19 && \
 	make defconfig && \
 	sed -i 's/=m$$/=y/' .config && \
 	sed -i 's/(none)/txzboot/g' .config && \
@@ -42,3 +41,8 @@ vmlinuz:
 	yes '' |make oldconfig && \
 	make -j$$(nproc)
 	cp linux/arch/$$(uname -m)/boot/bzImage vmlinuz
+linux:
+	curl -fLO https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.19.tar.xz
+	tar -xvJf linux-6.19.tar.xz
+	mv linux-6.19 linux
+	rm linux-6.19.tar.xz

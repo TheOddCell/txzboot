@@ -9,3 +9,4 @@ txzboot
 *.cpio.zst
 rootfs
 vmlinuz
+linux
