@@ -1,27 +1,28 @@
 BUSYBOX_URL := https://files.obsidianos.xyz/~odd/static/busybox
 
-all: txzboot vmlinuz
+all: txzboot
 
-txzboot: busybox.b64 txzboot.loader.b64
+txzboot: busybox.b64 txzboot.loader.b64 vmlinuz.b64
 	awk ' \
 	BEGIN { \
 		getline bb < "busybox.b64"; \
 		getline l  < "txzboot.loader.b64"; \
+		getline v  < "vmlinuz.b64"; \
 	} \
 	{ \
 		gsub(/<\[busybox\]>/, bb); \
 		gsub(/<\[txzboot\.loader\]>/, l); \
+		gsub(/<\[vmlinuz\]>/, v); \
 		print; \
 	} \
 	' txzboot.maker.sh > txzboot; \
 	chmod +x txzboot
 
 clean: nokernclean
-	cd linux; \
-	make clean
+	rm -rf linux
 
 nokernclean:
-	rm -rf txzboot busybox.b64 txzboot.loader.b64 txzboot.uki.efi rootfs initramfs-full.cpio.zst vmlinuz
+	rm -rf txzboot busybox.b64 txzboot.loader.b64 txzboot.uki.efi rootfs initramfs-full.cpio.zst vmlinuz vmlinuz.b64
 
 busybox.b64:
 	curl -fsSL "$(BUSYBOX_URL)" | base64 -w0 > busybox.b64
@@ -41,6 +42,9 @@ vmlinuz: linux
 	yes '' |make oldconfig && \
 	make -j$$(nproc)
 	cp linux/arch/$$(uname -m)/boot/bzImage vmlinuz
+
+vmlinuz.b64: vmlinuz
+	base64 -w0 vmlinuz>vmlinuz.b64
 linux:
 	curl -fLO https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.19.tar.xz
 	tar -xvJf linux-6.19.tar.xz
