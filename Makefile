@@ -30,7 +30,8 @@ txzboot.loader.b64:
 
 .PHONY: all clean nokernclean
 
-vmlinuz: linux
+vmlinuz:
+	git submodule init linux
 	cd linux && \
 	git checkout v6.19 && \
 	make defconfig && \
@@ -41,7 +42,3 @@ vmlinuz: linux
 	yes '' |make oldconfig && \
 	make -j$$(nproc)
 	cp linux/arch/$$(uname -m)/boot/bzImage vmlinuz
-
-
-linux:
-	git submodule init
