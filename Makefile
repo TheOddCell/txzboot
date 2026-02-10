@@ -34,7 +34,7 @@ vmlinuz: linux
 	git checkout v6.19 && \
 	make defconfig && \
 	sed -i 's/=m$$/=y/' .config && \
-	make -j$$(nproc) && \
+	make -j$$(nproc)
 	cp linux/arch/$$(uname -m)/boot/bzImage vmlinuz
 
 linux:
