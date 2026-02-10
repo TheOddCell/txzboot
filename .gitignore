@@ -8,3 +8,4 @@ txzboot
 *.b64
 *.cpio.zst
 rootfs
+vmlinuz

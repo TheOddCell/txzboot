@@ -4,6 +4,11 @@ if [ -z "$1" ]; then
   echo "Please provide the path to your tar.xz."
   exit 1
 fi
+if ! [ -e "vmlinuz" ]; then
+  echo "Have you compiled your kernel yet? (O.O)"
+  echo "If you havent compiled your kernel yet I will report you to the gentoo authority which will force you to compile your kernel."
+  echo "Compile your kernel by making sure you have your submodules cloned and running make vmlinuz"
+fi
 echo "txzboot.maker"
 mkdir rootfs
 mkdir rootfs/bin
