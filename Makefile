@@ -31,6 +31,7 @@ txzboot.loader.b64:
 
 vmlinuz: linux
 	cd linux && \
+	git checkout v6.19
 	make defconfig && \
 	sed -i 's/=m$$/=y/' .config && \
 	make -j$$(nproc) && \
@@ -38,5 +39,3 @@ vmlinuz: linux
 
 linux:
 	git submodule init
-	cd linux && \
-	git checkout v6.19
