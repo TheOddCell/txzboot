@@ -36,10 +36,12 @@ vmlinuz: linux
 	make defconfig && \
 	sed -i 's/=m$$/=y/' .config && \
 	sed -i 's/(none)/txzboot/g' .config && \
-	sed -i 's/# CONFIG_SQUASHFS is not set/CONFIG_SQUASHFS=y/' .config
-	sed -i 's/CONFIG_LOCALVERSION=""/CONFIG_LOCALVERSION="-txzboot"/' .config
+	sed -i 's/# CONFIG_SQUASHFS is not set/CONFIG_SQUASHFS=y/' .config && \
+	sed -i 's/CONFIG_LOCALVERSION=""/CONFIG_LOCALVERSION="-txzboot"/' .config && \
+	yes '' |make oldconfig && \
 	make -j$$(nproc)
 	cp linux/arch/$$(uname -m)/boot/bzImage vmlinuz
+
 
 linux:
 	git submodule init
