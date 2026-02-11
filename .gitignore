@@ -11,3 +11,6 @@ rootfs
 vmlinuz
 linux
 .vmlinuz
+vmlinuz.tmp
+*.cpio.zst
+

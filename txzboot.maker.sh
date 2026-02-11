@@ -19,7 +19,7 @@ echo "<[txzboot.loader]>"    | base64 -d > rootfs/bin/txzboot.loader
 ln rootfs/bin/txzboot.loader rootfs/init
 chmod a+x rootfs/init
 echo "txzboot.loader installed"
-if [ "$1" != '--shellonly' ]; then
+if [ "$1" != 'shell' ]; then
   if [ "${1##*.}" = "xz" ]; then
     cp "$1" rootfs/boot.txz
     echo "boot.txz added"
@@ -43,4 +43,6 @@ ukify build \
   --cmdline "rw" --output "txzboot.uki.efi"
 echo "txzboot.loader created"
 echo "Cleaning up..."
-rm -rf rootfs initramfs-full.cpio.zst vmlinuz.tmp
+if [ "$2" != "--nocleanup" ]
+  rm -rf rootfs initramfs-full.cpio.zst vmlinuz.tmp
+fi
