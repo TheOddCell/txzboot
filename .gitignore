@@ -13,4 +13,4 @@ linux
 .vmlinuz
 vmlinuz.tmp
 *.cpio.zst
-
+.busybox

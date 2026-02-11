@@ -18,14 +18,15 @@ txzboot: .busybox.b64 .txzboot.loader.b64 .vmlinuz.b64
 	' txzboot.maker.sh > txzboot; \
 	chmod +x txzboot
 
-clean: nokernclean
+clean: nodepclean
 	rm -rf linux
+	rm -rf busybox
 
-nokernclean:
-	rm -rf txzboot .busybox.b64 .txzboot.loader.b64 txzboot.uki.efi rootfs initramfs-full.cpio.zst .vmlinuz .vmlinuz.b64
+nodepclean:
+	rm -rf txzboot .busybox.b64 .txzboot.loader.b64 txzboot.uki.efi rootfs initramfs-full.cpio.zst .vmlinuz .vmlinuz.b64 .busybox
 
-.busybox.b64:
-	curl -fsSL "$(BUSYBOX_URL)" | base64 -w0 > .busybox.b64
+.busybox.b64: .busybox
+	base64 -w0 .busybox>.busybox.b64
 
 .txzboot.loader.b64:
 	base64 -w0 ./txzboot.loader.sh > .txzboot.loader.b64
@@ -45,8 +46,17 @@ nokernclean:
 
 .vmlinuz.b64: .vmlinuz
 	base64 -w0 .vmlinuz>.vmlinuz.b64
+
 linux:
-	curl -fLO https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.19.tar.xz
-	tar -xvJf linux-6.19.tar.xz
+	curl -fL https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.19.tar.xz | tar -xvJ
 	mv linux-6.19 linux
-	rm linux-6.19.tar.xz
+
+.busybox:
+	curl -fL https://busybox.net/downloads/busybox-1.37.0.tar.bz2 | tar -xvj
+	mv busybox-1.37.0 busybox
+	cd busybox && \
+	make defconfig && \
+	sed -i 's/CONFIG_TC=y/CONFIG_TC=n/g' .config && \ # sometimes this just doesn't work.
+	yes | make oldconfig && \
+	LDFLAGS='-static' make -j$(nproc)
+	cp busybox/busybox .busybox
