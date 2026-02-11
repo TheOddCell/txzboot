@@ -48,7 +48,7 @@ ukify build \
   --cmdline "rw" --output "txzboot.uki.efi"
 rm vmlinuz.tmp
 echo "txzboot.loader created"
-if [ "$2" != "--nocleanup" ]
+if [ "$2" != "--nocleanup" ]; then
   echo "Cleaning up..."
   rm -rf rootfs initramfs-full.cpio.zst
 fi

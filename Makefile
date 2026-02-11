@@ -1,8 +1,6 @@
-BUSYBOX_URL := https://files.obsidianos.xyz/~odd/static/busybox
+all: .busybox .vmlinuz txzboot
 
-all: txzboot
-
-txzboot: .busybox.b64 .txzboot.loader.b64 .vmlinuz.b64
+txzboot: .vmlinuz.b64 .busybox.b64 .txzboot.loader.b64
 	awk ' \
 	BEGIN { \
 		getline bb < ".busybox.b64"; \
@@ -51,12 +49,14 @@ linux:
 	curl -fL https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.19.tar.xz | tar -xvJ
 	mv linux-6.19 linux
 
-.busybox:
-	curl -fL https://busybox.net/downloads/busybox-1.37.0.tar.bz2 | tar -xvj
-	mv busybox-1.37.0 busybox
+.busybox: busybox
 	cd busybox && \
 	make defconfig && \
-	sed -i 's/CONFIG_TC=y/CONFIG_TC=n/g' .config && \ # sometimes this just doesn't work.
+	sed -i 's/CONFIG_TC=y/CONFIG_TC=n/g' .config && \
 	yes | make oldconfig && \
 	LDFLAGS='-static' make -j$(nproc)
 	cp busybox/busybox .busybox
+
+busybox:
+	curl -fL https://busybox.net/downloads/busybox-1.37.0.tar.bz2 | tar -xvj
+	mv busybox-1.37.0 busybox
