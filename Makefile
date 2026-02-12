@@ -1,15 +1,17 @@
 all: .busybox .vmlinuz txzboot
 
-txzboot: .vmlinuz.b64 .busybox.b64 .txzboot.loader.b64
+txzboot: .vmlinuz.b64 .busybox.b64 .txzboot.loader.b64 .sfsboot.loader.b64
 	awk ' \
 	BEGIN { \
 		getline bb < ".busybox.b64"; \
 		getline l  < ".txzboot.loader.b64"; \
+		getline s  < ".sfsboot.loader.b64"; \
 		getline v  < ".vmlinuz.b64"; \
 	} \
 	{ \
 		gsub(/<\[busybox\]>/, bb); \
 		gsub(/<\[txzboot\.loader\]>/, l); \
+		gsub(/<\[sfsboot\.loader\]>/, s); \
 		gsub(/<\[vmlinuz\]>/, v); \
 		print; \
 	} \
@@ -21,13 +23,16 @@ clean: nodepclean
 	rm -rf busybox
 
 nodepclean:
-	rm -rf txzboot .busybox.b64 .txzboot.loader.b64 txzboot.uki.efi rootfs initramfs-full.cpio.zst .vmlinuz .vmlinuz.b64 .busybox
+	rm -rf txzboot .busybox.b64 .txzboot.loader.b64 txzboot.uki.efi rootfs initramfs-full.cpio.zst .vmlinuz .vmlinuz.b64 .busybox .sfsboot.loader.b64
 
 .busybox.b64: .busybox
 	base64 -w0 .busybox>.busybox.b64
 
 .txzboot.loader.b64:
 	base64 -w0 ./txzboot.loader.sh > .txzboot.loader.b64
+
+.sfsboot.loader.b64:
+	base64 -w0 ./sfsboot.loader.sh > .sfsboot.loader.b64
 
 .PHONY: all clean nokernclean
 
@@ -37,6 +42,8 @@ nodepclean:
 	sed -i 's/=m$$/=y/' .config && \
 	sed -i 's/(none)/txzboot/g' .config && \
 	sed -i 's/# CONFIG_SQUASHFS is not set/CONFIG_SQUASHFS=y/' .config && \
+	sed -i 's/# CONFIG_OVERLAY_FS is not set/CONFIG_OVERLAY_FS=y/' .config && \
+	sed -i 's/# CONFIG_FUSE_FS is not set/CONFIG_FUSE_FS=y/' .config && \
 	sed -i 's/CONFIG_LOCALVERSION=""/CONFIG_LOCALVERSION="-txzboot"/' .config && \
 	yes '' |make oldconfig && \
 	make -j$$(nproc)
