@@ -34,17 +34,22 @@ nodepclean:
 .sfsboot.loader.b64:
 	base64 -w0 ./sfsboot.loader.sh > .sfsboot.loader.b64
 
-.PHONY: all clean nokernclean
+.PHONY: all clean nodepclean
 
 .vmlinuz: linux
 	cd linux && \
 	make defconfig && \
-	sed -i 's/=m$$/=y/' .config && \
-	sed -i 's/(none)/txzboot/g' .config && \
-	sed -i 's/# CONFIG_SQUASHFS is not set/CONFIG_SQUASHFS=y/' .config && \
-	sed -i 's/# CONFIG_OVERLAY_FS is not set/CONFIG_OVERLAY_FS=y/' .config && \
-	sed -i 's/# CONFIG_FUSE_FS is not set/CONFIG_FUSE_FS=y/' .config && \
-	sed -i 's/CONFIG_LOCALVERSION=""/CONFIG_LOCALVERSION="-txzboot"/' .config && \
+	sed -i 's/=m$$/=y/'							.config && \
+	sed -i 's/(none)/txzboot/g' 						.config && \
+	sed -i 's/# CONFIG_SQUASHFS is not set/CONFIG_SQUASHFS=y/'		.config && \
+	sed -i 's/# CONFIG_OVERLAY_FS is not set/CONFIG_OVERLAY_FS=y/'		.config && \
+	sed -i 's/# CONFIG_FUSE_FS is not set/CONFIG_FUSE_FS=y/'		.config && \
+	sed -i 's/CONFIG_LOCALVERSION=""/CONFIG_LOCALVERSION="-txzboot"/'	.config && \
+	yes '' | make oldconfig && \
+	sed -i 's/# CONFIG_SQUASHFS_LZ4 is not set/CONFIG_SQUASHFS_LZ4=y/'	.config && \
+	sed -i 's/# CONFIG_SQUASHFS_LZO is not set/CONFIG_SQUASHFS_LZO=y/'	.config && \
+	sed -i 's/# CONFIG_SQUASHFS_XZ is not set/CONFIG_SQUASHFS_XZ=y/'	.config && \
+	sed -i 's/# CONFIG_SQUASHFS_ZSTD is not set/CONFIG_SQUASHFS_ZSTD=y/'	.config && \
 	yes '' |make oldconfig && \
 	make -j$$(nproc)
 	cp linux/arch/$$(uname -m)/boot/bzImage .vmlinuz

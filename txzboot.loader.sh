@@ -17,7 +17,7 @@ if ! [ -f /boot.txz ] && ! [ -f /boot.tgz ] && ! [ -f /boot.tar ]; then
   echo "<0>txzboot.loader: no boot.txz/tgz/tar found, dropping to shell">&5
   exec sh
 fi
-printf "Press c within 5 seconds to configure, or press any other key to skip\r"
+printf "Press enter within 5 seconds to configure\r"
 CONFIG1SHELL="false"
 CONFIGSHELL="false"
 CONFIGPATH=""
@@ -25,8 +25,7 @@ CONFIGPATHSET="false"
 CONFIGTARPROGRESS="false"
 CONFIGNORAMFS="false"
 CONFIGDELROOTPASSWD="false"
-read -t 5 -n 1 key 2>/dev/null
-if [ "$key" = "c" ]; then
+if IFS= read -r -t 5 _; then
   unset key
   printf "\r                                                                          "
   printf "\rCONFIG: debug: exec [pid 1] shell now (y/n): "
