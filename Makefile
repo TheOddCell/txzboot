@@ -46,10 +46,12 @@ nodepclean:
 	sed -i 's/# CONFIG_FUSE_FS is not set/CONFIG_FUSE_FS=y/'		.config && \
 	sed -i 's/CONFIG_LOCALVERSION=""/CONFIG_LOCALVERSION="-txzboot"/'	.config && \
 	yes '' | make oldconfig && \
-	sed -i 's/# CONFIG_SQUASHFS_LZ4 is not set/CONFIG_SQUASHFS_LZ4=y/'	.config && \
-	sed -i 's/# CONFIG_SQUASHFS_LZO is not set/CONFIG_SQUASHFS_LZO=y/'	.config && \
-	sed -i 's/# CONFIG_SQUASHFS_XZ is not set/CONFIG_SQUASHFS_XZ=y/'	.config && \
-	sed -i 's/# CONFIG_SQUASHFS_ZSTD is not set/CONFIG_SQUASHFS_ZSTD=y/'	.config && \
+	sed -i 's/# CONFIG_SQUASHFS_LZ4 is not set/CONFIG_SQUASHFS_LZ4=y/'			.config && \
+	sed -i 's/# CONFIG_SQUASHFS_LZO is not set/CONFIG_SQUASHFS_LZO=y/'			.config && \
+	sed -i 's/# CONFIG_SQUASHFS_XZ is not set/CONFIG_SQUASHFS_XZ=y/'			.config && \
+	sed -i 's/# CONFIG_SQUASHFS_ZSTD is not set/CONFIG_SQUASHFS_ZSTD=y/'			.config && \
+	sed -i 's/# CONFIG_SQUASHFS_ZLIB is not set/CONFIG_SQUASHFS_ZLIB=y/'			.config && \
+	sed -i 's/# CONFIG_SQUASHFS_DECOMP_MULTI_PERCPU is not set/CONFIG_SQUASHFS_DECOMP_MULTI_PERCPU=y/' .config && \
 	yes '' |make oldconfig && \
 	make -j$$(nproc)
 	cp linux/arch/$$(uname -m)/boot/bzImage .vmlinuz
@@ -58,8 +60,8 @@ nodepclean:
 	base64 -w0 .vmlinuz>.vmlinuz.b64
 
 linux:
-	curl -fL https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.19.tar.xz | tar -xvJ
-	mv linux-6.19 linux
+	curl -fL https://cdn.kernel.org/pub/linux/kernel/v7.x/linux-7.0.8.tar.xz | tar -xvJ
+	mv linux-7.0.8 linux
 
 .busybox: busybox
 	cd busybox && \
@@ -70,5 +72,5 @@ linux:
 	cp busybox/busybox .busybox
 
 busybox:
-	curl -fL https://busybox.net/downloads/busybox-1.37.0.tar.bz2 | tar -xvj
+	curl -fL https://boot.tarxz.zip/busybox-1.37.0.tar.xz  | tar -xvJ
 	mv busybox-1.37.0 busybox
