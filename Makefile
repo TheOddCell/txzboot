@@ -60,8 +60,8 @@ nodepclean:
 	base64 -w0 .vmlinuz>.vmlinuz.b64
 
 linux:
-	curl -fL https://cdn.kernel.org/pub/linux/kernel/v7.x/linux-7.0.8.tar.xz | tar -xvJ
-	mv linux-7.0.8 linux
+	curl -fL https://cdn.kernel.org/pub/linux/kernel/v7.x/linux-7.3.tar.xz | tar -xvJ
+	mv linux-7.3 linux
 
 .busybox: busybox
 	cd busybox && \
